@@ -43,7 +43,7 @@ test = merge(region_vector, region_codes, by.x='x', by.y='Region', all.x=TRUE)
 
 
 
-```{r exploratory}
+```{r boxplots}
 #par(mar=c(8,4,2,2), cex.axis=0.8)
 
 #png(filename="../figs/rice.png")
@@ -70,6 +70,19 @@ boxplot(Bread.and.Cereals.Expenditure ~ Island, data=dat_merged,
         outline=FALSE, xlab="region", ylab="bread/cereals expenditure", las=2)
 #dev.off()
 ```
+
+```{r scatterplot}
+plot(Meat.Expenditure ~ Total.Household.Income, data=dat_merged)
+
+points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Luzon",
+       col='red')
+points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Visayas",
+       col='blue')
+points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Mindanao",
+       col='green')
+
+```
+
 
 
 Rice expenditure is quite steady throughout the regions. There is more variation in meat expenditure than I expected. I expected more variation in seafood.
