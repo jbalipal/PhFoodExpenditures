@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load}
 dat = read.csv('../data/ph_fies.csv')
-regions = read.csv('../data/regions.csv')
+region_codes = read.csv('../data/region_codes.csv')
 
 ```
 
@@ -26,10 +26,10 @@ dat_sub = dat[,features]
 ```
 
 ```{r merge}
-dat_merged = merge(dat_sub, regions, all.x=TRUE)
+dat_merged = merge(dat_sub, region_codes, all.x=TRUE)
 ```
 
-```{r}
+
 # vector of regions
 region_vector = unique(dat_sub[,2], MARGIN=2)
 
@@ -39,48 +39,48 @@ Mindanao = region_vector[c(2, 5, 10, 11, 16, 17)]
 
 island = region_vector[c(Luzon, Visayas, Mindanao)]
 
-test = merge(region_vector, regions, by.x='x', by.y='Region', all.x=TRUE)
-```
+test = merge(region_vector, region_codes, by.x='x', by.y='Region', all.x=TRUE)
+
 
 
 ```{r exploratory}
-par(mar=c(8,4,2,2), cex.axis=0.8)
+#par(mar=c(8,4,2,2), cex.axis=0.8)
 
 #png(filename="../figs/rice.png")
-boxplot(Total.Rice.Expenditure ~ Regione data=dat_sub,
+boxplot(Total.Rice.Expenditure ~ Island, data=dat_merged,
         outline=FALSE, xlab="region", ylab="rice expenditure", las=2)
+#dev.off()
+
+#png(filename="../figs/meat.png")
+boxplot(Meat.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="region", ylab="meat expenditure", las=2)
+#dev.off()
+
+boxplot(Total.Fish.and..marine.products.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="region", ylab="seafood expenditure", las=2)
+
+boxplot(Fruit.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="region", ylab="fruit expenditure", las=2)
+
+boxplot(Vegetables.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="region", ylab="vegetables expenditure", las=2)
+
+#png(filename="../figs/bread.png")
+boxplot(Bread.and.Cereals.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="region", ylab="bread/cereals expenditure", las=2)
 #dev.off()
 ```
 
-png(filename="../figs/meat.png")
-boxplot(Meat.Expenditure ~ Region, data=dat_sub,
-        outline=FALSE, xlab="region", ylab="meat expenditure", las=2)
-dev.off()
 
-boxplot(Total.Fish.and..marine.products.Expenditure ~ Region, data=dat_sub,
-        outline=FALSE, xlab="region", ylab="seafood expenditure", las=2)
-
-boxplot(Fruit.Expenditure ~ Region, data=dat_sub,
-        outline=FALSE, xlab="region", ylab="fruit expenditure", las=2)
-
-boxplot(Vegetables.Expenditure ~ Region, data=dat_sub,
-        outline=FALSE, xlab="region", ylab="vegetables expenditure", las=2)
-
-png(filename="../figs/bread.png")
-boxplot(Bread.and.Cereals.Expenditure ~ Region, data=dat_sub,
-        outline=FALSE, xlab="region", ylab="bread/cereals expenditure", las=2)
-dev.off()
-
-
-
-Rice expenditure is quite study throughout the regions. There is more variation in meat expenditure than I expected. I expected more variation in seafood.
+Rice expenditure is quite steady throughout the regions. There is more variation in meat expenditure than I expected. I expected more variation in seafood.
 
 
 ```{r mean}
 # do not include region in mean calculation
-avg_spending = aggregate(dat_sub[,-c(2)], list(dat_sub$Region), mean)
-dat_expenditures = dat_sub[,-c(2)]
+avg_spending = aggregate(dat_merged[,-c(1,10)], list(dat_merged$Region), mean)
+dat_expenditures = dat_merged[,-c(1,10)]
 mean_expenditures = colMeans(dat_expenditures)
+print(avg_spending)
 print(mean_expenditures)
 ```
 
@@ -89,5 +89,5 @@ On average, citizens spend almost the same on meat and seafood. I'm surprised to
 
 ```{r scatter}
 #plot(Meat.Expenditure ~ Total.Household.Income, data= dat_sub, xlab="Total Household Income", ylab="Meat Expenditure")
-pairs(dat_sub)
+#pairs(dat_sub)
 ```
