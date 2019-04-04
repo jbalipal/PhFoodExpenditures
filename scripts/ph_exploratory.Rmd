@@ -9,6 +9,10 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r imports}
+library(vegan)
+```
+
 ```{r load}
 dat = read.csv('../data/ph_fies.csv')
 region_codes = read.csv('../data/region_codes.csv')
@@ -19,7 +23,7 @@ region_codes = read.csv('../data/region_codes.csv')
 ```{r subset}
 # total household income, region, bread/cereals
 # rice, meat, seafood, fruit, vegetables
-features = c(1,2,3,6,7,8,9,10,11)
+features = c(1,2,3,6,7,8,9,10,11,21,34)
 
 # data with only features to inspect
 dat_sub = dat[,features]
@@ -88,14 +92,14 @@ points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Islan
 Rice expenditure is quite steady throughout the regions. There is more variation in meat expenditure than I expected. I expected more variation in seafood.
 
 
-```{r mean}
+{r mean}
 # do not include region in mean calculation
 avg_spending = aggregate(dat_merged[,-c(1,10)], list(dat_merged$Region), mean)
 dat_expenditures = dat_merged[,-c(1,10)]
 mean_expenditures = colMeans(dat_expenditures)
 print(avg_spending)
 print(mean_expenditures)
-```
+
 
 
 On average, citizens spend almost the same on meat and seafood. I'm surprised to see that the average spending on bread/cereals is higher than meat, rice, and seafood.
@@ -103,4 +107,72 @@ On average, citizens spend almost the same on meat and seafood. I'm surprised to
 ```{r scatter}
 #plot(Meat.Expenditure ~ Total.Household.Income, data= dat_sub, xlab="Total Household Income", ylab="Meat Expenditure")
 #pairs(dat_sub)
+```
+
+```{r pca}
+ph_pca = rda(dat_merged[2:11], scale=TRUE)
+ph_pca
+```
+
+```{r plot_pca}
+plot(ph_pca)
+biplot(ph_pca)
+#cleanplot.pca(ph_pca)
+```
+
+```{r main}
+meat_main = lm(Meat.Expenditure ~
+               Total.Household.Income + Total.Food.Expenditure + Education.Expenditure + Total.Number.of.Family.members, data=dat_merged)
+
+summary(meat_main)
+
+```
+
+```{r}
+income_mod = lm(Meat.Expenditure ~
+               Total.Household.Income, data=dat_merged)
+
+summary(income_mod)
+
+island_mod = lm(Meat.Expenditure ~
+               Island, data=dat_merged)
+
+summary(island_mod)
+
+
+```
+
+
+```{r int}
+meat_int = lm(Meat.Expenditure ~
+               Total.Household.Income * Island, data=dat_merged)
+
+summary(meat_int)
+
+```
+
+```{r aic}
+AIC(meat_int)
+AIC(income_mod)
+AIC(island_mod)
+
+```
+
+```{r}
+par(mfrow = c(2,2))
+plot(meat_int)
+```
+
+
+```{r scatter}
+# plot main
+plot(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, xlab="Total Household Income", ylab="Meat Expenditure")
+
+points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Luzon",
+       col='red')
+points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Visayas",
+       col='blue')
+points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Mindanao",
+       col='green')
+
 ```
