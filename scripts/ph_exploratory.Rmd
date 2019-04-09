@@ -21,158 +21,117 @@ region_codes = read.csv('../data/region_codes.csv')
 
 
 ```{r subset}
-# total household income, region, bread/cereals
-# rice, meat, seafood, fruit, vegetables
-features = c(1,2,3,6,7,8,9,10,11,21,34)
+# features to inpect
+features = c("Total.Household.Income", "Region", 
+             "Education.Expenditure", "Total.Number.of.Family.members", 
+             "Total.Food.Expenditure", "Bread.and.Cereals.Expenditure",
+             "Total.Rice.Expenditure", "Meat.Expenditure",
+             "Total.Fish.and..marine.products.Expenditure", "Fruit.Expenditure",
+             "Vegetables.Expenditure")
 
 # data with only features to inspect
 dat_sub = dat[,features]
 ```
 
 ```{r merge}
+# add island groups to samples for coarser level of granularity
 dat_merged = merge(dat_sub, region_codes, all.x=TRUE)
 ```
 
+Examining income and food expenditures for each island (Luzon, Visayas, Mindanao).
+```{r islands}
+boxplot(Total.Household.Income ~ Island, data=dat_merged,
+        outline=FALSE, xlab="island", ylab="household income", las=2)
 
-# vector of regions
-region_vector = unique(dat_sub[,2], MARGIN=2)
+boxplot(Total.Food.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="island", ylab="food expenditure", las=2)
 
-Luzon = region_vector[c(1, 4, 6, 7, 8, 13, 14, 15)]
-Visayas = region_vector[c(3, 9, 12)]
-Mindanao = region_vector[c(2, 5, 10, 11, 16, 17)]
-
-island = region_vector[c(Luzon, Visayas, Mindanao)]
-
-test = merge(region_vector, region_codes, by.x='x', by.y='Region', all.x=TRUE)
-
-
-
-```{r boxplots}
-#par(mar=c(8,4,2,2), cex.axis=0.8)
-
-#png(filename="../figs/rice.png")
 boxplot(Total.Rice.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="region", ylab="rice expenditure", las=2)
-#dev.off()
+        outline=FALSE, xlab="island", ylab="rice expenditure", las=2)
 
-#png(filename="../figs/meat.png")
 boxplot(Meat.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="region", ylab="meat expenditure", las=2)
-#dev.off()
+        outline=FALSE, xlab="island", ylab="meat expenditure", las=2)
 
 boxplot(Total.Fish.and..marine.products.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="region", ylab="seafood expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="seafood expenditure", las=2)
 
 boxplot(Fruit.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="region", ylab="fruit expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="fruit expenditure", las=2)
 
 boxplot(Vegetables.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="region", ylab="vegetables expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="vegetables expenditure", las=2)
 
-#png(filename="../figs/bread.png")
 boxplot(Bread.and.Cereals.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="region", ylab="bread/cereals expenditure", las=2)
-#dev.off()
+        outline=FALSE, xlab="island", ylab="bread/cereals expenditure", las=2)
 ```
 
-```{r scatterplot}
-plot(Meat.Expenditure ~ Total.Household.Income, data=dat_merged)
+Examining effect of number of family members on food expenditure.
+```{r family}
+plot(Total.Food.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="food expenditure", las=2)
 
-points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Luzon",
-       col='red')
-points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Visayas",
-       col='blue')
-points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Mindanao",
-       col='green')
+plot(Meat.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="meat expenditure", las=2)
+
+plot(Total.Fish.and..marine.products.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="seafood expenditure", las=2)
+
+plot(Total.Rice.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="rice expenditure", las=2)
+
+plot(Bread.and.Cereals.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="bread and cereal expenditure", las=2)
+
+plot(Fruit.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="fruit expenditure", las=2)
+
+plot(Vegetables.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="vegetables expenditure", las=2)
 
 ```
 
+Examining effect of education expenditure on food expenditure.
+```{r education}
+plot(Total.Food.Expenditure ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="food expenditure", las=2)
 
+plot(Meat.Expenditure ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="meat expenditure", las=2)
 
+plot(Total.Fish.and..marine.products.Expenditure ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="seafood expenditure", las=2)
+
+plot(Total.Rice.Expenditure ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="rice expenditure", las=2)
+
+plot(Bread.and.Cereals.Expenditure ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="bread and cereal expenditure", las=2)
+
+plot(Fruit.Expenditure ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="fruit expenditure", las=2)
+
+plot(Vegetables.Expenditure ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="vegetables expenditure", las=2)
+
+```
 Rice expenditure is quite steady throughout the regions. There is more variation in meat expenditure than I expected. I expected more variation in seafood.
 
 
-{r mean}
-# do not include region in mean calculation
-avg_spending = aggregate(dat_merged[,-c(1,10)], list(dat_merged$Region), mean)
-dat_expenditures = dat_merged[,-c(1,10)]
-mean_expenditures = colMeans(dat_expenditures)
-print(avg_spending)
-print(mean_expenditures)
+```{r models}
+meat_mod = lm(Meat.Expenditure ~
+               log10(Total.Household.Income) + Island, data=dat_merged)
+summary(meat_mod)
+
+rice_mod = lm(Total.Rice.Expenditure ~
+                Total.Number.of.Family.members, data=dat_merged)
+summary(rice_mod)
+
+bread_cereals_mod = lm(Bread.and.Cereals.Expenditure ~
+                Total.Number.of.Family.members, data=dat_merged)
+summary(bread_cereals_mod)
 
 
-
-On average, citizens spend almost the same on meat and seafood. I'm surprised to see that the average spending on bread/cereals is higher than meat, rice, and seafood.
-
-```{r scatter}
-#plot(Meat.Expenditure ~ Total.Household.Income, data= dat_sub, xlab="Total Household Income", ylab="Meat Expenditure")
-#pairs(dat_sub)
-```
-
-```{r pca}
-ph_pca = rda(dat_merged[2:11], scale=TRUE)
-ph_pca
-```
-
-```{r plot_pca}
-plot(ph_pca)
-biplot(ph_pca)
-#cleanplot.pca(ph_pca)
-```
-
-```{r main}
-meat_main = lm(Meat.Expenditure ~
-               Total.Household.Income + Total.Food.Expenditure + Education.Expenditure + Total.Number.of.Family.members, data=dat_merged)
-
-summary(meat_main)
-
-```
-
-```{r}
-income_mod = lm(Meat.Expenditure ~
-               Total.Household.Income, data=dat_merged)
-
-summary(income_mod)
-
-island_mod = lm(Meat.Expenditure ~
-               Island, data=dat_merged)
-
-summary(island_mod)
-
-
-```
-
-
-```{r int}
-meat_int = lm(Meat.Expenditure ~
-               Total.Household.Income * Island, data=dat_merged)
-
-summary(meat_int)
-
-```
-
-```{r aic}
-AIC(meat_int)
-AIC(income_mod)
-AIC(island_mod)
-
-```
-
-```{r}
-par(mfrow = c(2,2))
-plot(meat_int)
-```
-
-
-```{r scatter}
-# plot main
-plot(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, xlab="Total Household Income", ylab="Meat Expenditure")
-
-points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Luzon",
-       col='red')
-points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Visayas",
-       col='blue')
-points(Meat.Expenditure ~ Total.Household.Income, data=dat_merged, subset= Island == "Mindanao",
-       col='green')
-
+#termplot(meat_mod, partial.resid = T, se=T)
+#termplot(rice_mod, partial.resid = T, se=T)
+#termplot(bread_cereals_mod, partial.resid = T, se=T)
 ```
