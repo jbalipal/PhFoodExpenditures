@@ -21,7 +21,7 @@ region_codes = read.csv('../data/region_codes.csv')
 
 
 ```{r subset}
-# features to inpect
+# features to inspect
 features = c("Total.Household.Income", "Region", 
              "Education.Expenditure", "Total.Number.of.Family.members", 
              "Total.Food.Expenditure", "Bread.and.Cereals.Expenditure",
@@ -38,32 +38,67 @@ dat_sub = dat[,features]
 dat_merged = merge(dat_sub, region_codes, all.x=TRUE)
 ```
 
+Initial assumptions:
+1) Region will not have a significant effect on rice expenditure.
+2) Income will not have a significant effect on rice expenditure.
+3) People living in Visayas will spend more on seafood.
+4) People will spend more on seafood than on meat.
+5) Higher income households will spend more on meat.
+6) Mindanao will spend less on meat.
+
 Examining income and food expenditures for each island (Luzon, Visayas, Mindanao).
 ```{r islands}
+par(mfrow=c(2,4), mgp = c(3,1,0))
+
 boxplot(Total.Household.Income ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="household income", las=2)
+        outline=FALSE, xlab="island", ylab="household income (pesos)",
+        names=c("Luz", "Min", "Vis"), las=1)
 
 boxplot(Total.Food.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="food expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="food expenditure (pesos)",
+        names=c("Luz", "Min", "Vis"), las=1)
 
 boxplot(Total.Rice.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="rice expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="rice expenditure (pesos)", 
+        names=c("Luz", "Min", "Vis"), las=1)
 
 boxplot(Meat.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="meat expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="meat expenditure (pesos)", 
+        names=c("Luz", "Min", "Vis"), las=1)
 
 boxplot(Total.Fish.and..marine.products.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="seafood expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="seafood expenditure (pesos)", 
+        names=c("Luz", "Min", "Vis"), las=1)
 
 boxplot(Fruit.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="fruit expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="fruit expenditure (pesos)",
+        names=c("Luz", "Min", "Vis"), las=1)
 
 boxplot(Vegetables.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="vegetables expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="vegetables expenditure (pesos)",
+        names=c("Luz", "Min", "Vis"), las=1)
 
 boxplot(Bread.and.Cereals.Expenditure ~ Island, data=dat_merged,
-        outline=FALSE, xlab="island", ylab="bread/cereals expenditure", las=2)
+        outline=FALSE, xlab="island", ylab="bread/cereals expenditure (pesos)",
+        names=c("Luz", "Min", "Vis"), las=1)
 ```
+Luzon spends more on meat than the other islands, with Mindanao spending the least. Luzon also spends slightly more on fruits and vegetables compared to the other islands. Luzon also has the highest total household income. This seems to support assumptions 1 and 6.
+
+
+Do people spend more on seafood than on meat?
+```{r means}
+colMeans(dat_merged[c("Meat.Expenditure", "Total.Fish.and..marine.products.Expenditure")])
+```
+Assumption 4 does not hold. Meat expenditure is higher on average although it's not by a significant amount.
+
+
+Does Visayas spend more on seafood compared to other islands?
+```{r visayas}
+aggregate(dat_merged["Total.Fish.and..marine.products.Expenditure"], list(dat_merged$Island), mean)
+
+```
+Visayas does spend more on seafood compared to the other islands. This supports assumption 3, although the difference in spending between the islands is only differs by a few hundred pesos.
+
 
 Examining effect of number of family members on food expenditure.
 ```{r family}
