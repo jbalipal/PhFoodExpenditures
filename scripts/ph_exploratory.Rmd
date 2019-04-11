@@ -11,12 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r imports}
 library(vegan)
+library(scales)
 ```
 
 ```{r load}
+# data from Family Income and Expenditure survey
 dat = read.csv('../data/ph_fies.csv')
-region_codes = read.csv('../data/region_codes.csv')
 
+# data for classifying regions into 3 islands (Luzon, Mindanao, Visayas)
+region_codes = read.csv('../data/region_codes.csv')
 ```
 
 
@@ -89,7 +92,7 @@ Do people spend more on seafood than on meat?
 ```{r means}
 colMeans(dat_merged[c("Meat.Expenditure", "Total.Fish.and..marine.products.Expenditure")])
 ```
-Assumption 4 does not hold. Meat expenditure is higher on average although it's not by a significant amount.
+Assumption 4 does not hold. Meat expenditure is higher on average although it's not by a large amount.
 
 
 Does Visayas spend more on seafood compared to other islands?
@@ -97,7 +100,52 @@ Does Visayas spend more on seafood compared to other islands?
 aggregate(dat_merged["Total.Fish.and..marine.products.Expenditure"], list(dat_merged$Island), mean)
 
 ```
-Visayas does spend more on seafood compared to the other islands. This supports assumption 3, although the difference in spending between the islands is only differs by a few hundred pesos.
+Visayas does spend more on seafood compared to the other islands. This supports assumption 3, although the difference in spending between the islands only differs by a few hundred pesos.
+
+
+Examining income on food expenditures.
+```{r income}
+par(mfrow=c(2,4))
+plot(Total.Food.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="food expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Total.Food.Expenditure),
+      col='red', lwd=2)
+
+plot(Bread.and.Cereals.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="bread/cereals expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Bread.and.Cereals.Expenditure),
+      col='red', lwd=2)
+
+plot(Total.Rice.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="rice expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Total.Rice.Expenditure),
+      col='red', lwd=2)
+
+plot(Meat.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="meat expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Meat.Expenditure),
+      col='red', lwd=2)
+
+plot(Total.Fish.and..marine.products.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="seafood expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income,
+             dat_merged$Total.Fish.and..marine.products.Expenditure),
+      col='red', lwd=2)
+
+plot(Fruit.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="fruit expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Fruit.Expenditure),
+      col='red', lwd=2)
+
+plot(Vegetables.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="vegetables expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Vegetables.Expenditure),
+      col='red', lwd=2)
+
+```
+The graphs suggest that meat expenditure is affected by total household income and rice expenditure is not highly affected by total household income. Based on this information, assumptions 2 and 5 seem to hold.
+
+Seafood, fruit, and vegetable expenditure also seem to be affected by total household income.
 
 
 Examining effect of number of family members on food expenditure.
@@ -149,7 +197,6 @@ plot(Vegetables.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="vegetables expenditure", las=2)
 
 ```
-Rice expenditure is quite steady throughout the regions. There is more variation in meat expenditure than I expected. I expected more variation in seafood.
 
 
 ```{r models}
