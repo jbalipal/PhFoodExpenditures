@@ -30,7 +30,8 @@ features = c("Total.Household.Income", "Region",
              "Total.Food.Expenditure", "Bread.and.Cereals.Expenditure",
              "Total.Rice.Expenditure", "Meat.Expenditure",
              "Total.Fish.and..marine.products.Expenditure", "Fruit.Expenditure",
-             "Vegetables.Expenditure")
+             "Vegetables.Expenditure", "Members.with.age.less.than.5.year.old",
+             "Members.with.age.5...17.years.old")
 
 # data with only features to inspect
 dat_sub = dat[,features]
@@ -106,6 +107,7 @@ Visayas does spend more on seafood compared to the other islands. This supports 
 Examining income on food expenditures.
 ```{r income}
 par(mfrow=c(2,4))
+
 plot(Total.Food.Expenditure ~ Total.Household.Income, data=dat_merged,
      xlab="household income (pesos)", ylab="food expenditure (pesos)", las=1)
 lines(lowess(dat_merged$Total.Household.Income, dat_merged$Total.Food.Expenditure),
@@ -146,57 +148,172 @@ lines(lowess(dat_merged$Total.Household.Income, dat_merged$Vegetables.Expenditur
 The graphs suggest that meat expenditure is affected by total household income and rice expenditure is not highly affected by total household income. Based on this information, assumptions 2 and 5 seem to hold.
 
 Seafood, fruit, and vegetable expenditure also seem to be affected by total household income.
+Bread/cereal expenditure is not highly affected
+
+
+Investigating what factors affect rice expenditures.
+Examining other explanatory variables.
 
 
 Examining effect of number of family members on food expenditure.
 ```{r family}
+par(mfrow=c(2,4))
+
+plot(Total.Household.Income ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="household income", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Total.Household.Income),
+      col='red', lwd=2)
+
 plot(Total.Food.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
         xlab="family size", ylab="food expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Total.Food.Expenditure),
+      col='red', lwd=2)
 
 plot(Meat.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
         xlab="family size", ylab="meat expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Meat.Expenditure),
+      col='red', lwd=2)
 
 plot(Total.Fish.and..marine.products.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
         xlab="family size", ylab="seafood expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Total.Fish.and..marine.products.Expenditure),
+      col='red', lwd=2)
 
 plot(Total.Rice.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
         xlab="family size", ylab="rice expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Total.Rice.Expenditure),
+      col='red', lwd=2)
 
 plot(Bread.and.Cereals.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
         xlab="family size", ylab="bread and cereal expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Bread.and.Cereals.Expenditure),
+      col='red', lwd=2)
 
 plot(Fruit.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
         xlab="family size", ylab="fruit expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Fruit.Expenditure),
+      col='red', lwd=2)
 
 plot(Vegetables.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
         xlab="family size", ylab="vegetables expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Vegetables.Expenditure),
+      col='red', lwd=2)
 
 ```
+As the family size increases, spending on food overall also increases. Meat and especially fruit expenditures do not seem to be affected much. An interesting finding is that household income is not affected much by family size. This means that small and large families have about the same income. Fruit may be a lower priority food group, which would explain why there is no noteable increase in fruit expenditure when the family size grows.
 
 Examining effect of education expenditure on food expenditure.
 ```{r education}
+par(mfrow=c(2,4))
+
+plot(Total.Household.Income ~ Education.Expenditure, data=dat_merged,
+        xlab="education", ylab="household income", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Total.Household.Income),
+      col='red', lwd=2)
+
 plot(Total.Food.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="food expenditure", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Total.Food.Expenditure),
+      col='red', lwd=2)
 
 plot(Meat.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="meat expenditure", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Meat.Expenditure),
+      col='red', lwd=2)
 
 plot(Total.Fish.and..marine.products.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="seafood expenditure", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Total.Fish.and..marine.products.Expenditure),
+      col='red', lwd=2)
 
 plot(Total.Rice.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="rice expenditure", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Total.Rice.Expenditure),
+      col='red', lwd=2)
 
 plot(Bread.and.Cereals.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="bread and cereal expenditure", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Bread.and.Cereals.Expenditure),
+      col='red', lwd=2)
 
 plot(Fruit.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="fruit expenditure", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Fruit.Expenditure),
+      col='red', lwd=2)
 
 plot(Vegetables.Expenditure ~ Education.Expenditure, data=dat_merged,
         xlab="education", ylab="vegetables expenditure", las=2)
+lines(lowess(dat_merged$Education.Expenditure, dat_merged$Vegetables.Expenditure),
+      col='red', lwd=2)
 
 ```
+Spending on education seems to have a substantial affect on household income and food expenditure. Household with higher incomes may be more willing to spend on education. Since households with higher incomes also spend more on food, this may explain why education is also positively correlated with education. A few of the food groups have slight increases as more is spent on education. Rice, bread/cereals, and fruit expenditures seem to be mostly unaffected by spending on education.
+
+
+Examining if the number of young children affects food expenditures.
+```{r children}
+par(mfrow=c(2,4))
+
+plot(Total.Household.Income ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="household income", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Total.Household.Income),
+      col='red', lwd=2)
+
+plot(Total.Food.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="food expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Total.Food.Expenditure),
+      col='red', lwd=2)
+
+plot(Meat.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="meat expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Meat.Expenditure),
+      col='red', lwd=2)
+
+plot(Total.Fish.and..marine.products.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="seafood expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Total.Fish.and..marine.products.Expenditure),
+      col='red', lwd=2)
+
+plot(Total.Rice.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="rice expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Total.Rice.Expenditure),
+      col='red', lwd=2)
+
+plot(Bread.and.Cereals.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="bread and cereal expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Bread.and.Cereals.Expenditure),
+      col='red', lwd=2)
+
+plot(Fruit.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="fruit expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Fruit.Expenditure),
+      col='red', lwd=2)
+
+plot(Vegetables.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="children less than 5", ylab="vegetables expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Vegetables.Expenditure),
+      col='red', lwd=2)
+
+```
+Not sure if this is correct. The max number for "Members.with.age.less.than.5.year.old" is 5. While it may not be common, I feel like there would be instances where there would be more than 5 children younger than 5 in a household.
+
+This feature does not seem to have much affect on income or food expenditures.
+
+```{r children_education}
+par(mfrow=c(1,2))
+
+plot(Education.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged,
+        xlab="age < 5", ylab="education", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Education.Expenditure ),
+      col='red', lwd=2)
+
+plot(Education.Expenditure ~ Members.with.age.5...17.years.old, data=dat_merged,
+        xlab="5 < age < 17", ylab="education", las=2)
+lines(lowess(dat_merged$Members.with.age.5...17.years.old, dat_merged$Education.Expenditure),
+      col='red', lwd=2)
+
+```
+I was expecting the number of members under the age of 17 to have more affect on the amount spent on education, but this does not seem to be the case.
 
 
 ```{r models}
