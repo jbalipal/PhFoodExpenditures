@@ -387,7 +387,7 @@ par(mfrow=c(2,2))
 termplot(bread_main, partial.resid = T, se=T)
 termplot(bread_int, partial.resid = T, se=T)
 ```
-Similar to the examination of rice expenditures, number of young children doesn't seem to be a big factor in bread/cereal expenditure. Interaction affects model is slightly better. 
+Similar to the examination of rice expenditures, number of young children doesn't seem to be a big factor in bread/cereal expenditure. Income has a significant affect on bread/cereal expenditure. Interaction affects model is slightly better. 
 
 ```{r seafood models}
 # income, family size, and island seem to have the most affect on seafood expenditures
@@ -414,4 +414,54 @@ termplot(seafood_main, partial.resid = T, se=T)
 termplot(seafood_int, partial.resid = T, se=T)
 ```
 Interaction affect is the best model. The termplot for number of family members in interaction affect model is interesting.
+
+
+```{r fruit models}
+# island and income seems to have the most affect on fruit expenditure
+fruit_main = lm(Fruit.Expenditure ~ 
+              Total.Household.Income + Island,
+              data=dat_merged)
+fruit_int = lm(Fruit.Expenditure ~ 
+               Total.Household.Income * Island,  
+              data=dat_merged)
+
+```
+```{r fruit diagnostics}
+summary(fruit_main)
+summary(fruit_int)
+
+AIC(fruit_main)
+AIC(fruit_int)
+
+par(mfrow=c(2,2))
+termplot(fruit_main, partial.resid = T, se=T)
+termplot(fruit_int, partial.resid = T, se=T)
+```
+
+Interaction effect model is the best. Island doesn't seem to have much affect. Household income is a better indicator of fruit expenditures.
+
+```{r vegetable models}
+# island, family size and income seems to have the most affect on vegetable expenditure
+vegetable_main = lm(Vegetables.Expenditure ~ 
+              Total.Household.Income + Island + Total.Number.of.Family.members,
+              data=dat_merged)
+vegetable_int = lm(Vegetables.Expenditure ~ 
+               Total.Household.Income * Island * Total.Number.of.Family.members,  
+              data=dat_merged)
+
+```
+```{r vegetable diagnostics}
+summary(vegetable_main)
+summary(vegetable_int)
+
+AIC(vegetable_main)
+AIC(vegetable_int)
+
+par(mfrow=c(2,2))
+termplot(vegetable_main, partial.resid = T, se=T)
+termplot(vegetable_int, partial.resid = T, se=T)
+```
+Interaction affect is the better model. Income has the biggest affect. Family size has a much smaller affect and island has a very small affect.
+
+
 
