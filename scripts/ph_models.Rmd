@@ -9,3 +9,258 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r imports}
+library(vegan)
+library(scales)
+```
+```{r load}
+# data from Family Income and Expenditure survey
+dat = read.csv('../data/ph_fies.csv')
+
+# data for classifying regions into 3 islands (Luzon, Mindanao, Visayas)
+region_codes = read.csv('../data/region_codes.csv')
+```
+
+
+```{r subset}
+# features to inspect
+features = c("Total.Household.Income", "Region", 
+             "Education.Expenditure", "Total.Number.of.Family.members", 
+             "Total.Food.Expenditure", "Bread.and.Cereals.Expenditure",
+             "Total.Rice.Expenditure", "Meat.Expenditure",
+             "Total.Fish.and..marine.products.Expenditure", "Fruit.Expenditure",
+             "Vegetables.Expenditure", "Members.with.age.less.than.5.year.old",
+             "Members.with.age.5...17.years.old")
+
+# data with only features to inspect
+dat_sub = dat[,features]
+```
+```{r merge}
+# add island groups to samples for coarser level of granularity
+dat_merged = merge(dat_sub, region_codes, all.x=TRUE)
+```
+
+```{r meat plots}
+png(filename='../figs/meat_island.png')
+boxplot(Meat.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="island", ylab="meat expenditure (pesos)", 
+        names=c("Luz", "Min", "Vis"), las=1)
+dev.off()
+
+png(filename='../figs/meat_income.png')
+plot(Meat.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="meat expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Meat.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+```
+
+```{r meat models}
+# income and island seem to have the most affect on meat expenditures
+meat_int = lm(Meat.Expenditure ~
+              log10(Total.Household.Income) * Island, data=dat_merged)
+
+```
+
+```{r meat diagnostics}
+summary(meat_int)
+
+par(mfrow=c(2,2))
+termplot(meat_int, partial.resid = T, se=T)
+```
+
+```{r rice plots}
+
+png(filename='../figs/rice_fsize.png')
+plot(Total.Rice.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="rice expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Total.Rice.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+png(filename='../figs/rice_children.png')
+boxplot(Total.Rice.Expenditure ~ Members.with.age.less.than.5.year.old, data=dat_merged, 
+        outline=FALSE, xlab="children less than 5", ylab="rice expenditure", las=2)
+lines(lowess(dat_merged$Members.with.age.less.than.5.year.old, dat_merged$Total.Rice.Expenditure),
+      col='red', lwd=2)
+
+dev.off()
+
+```
+
+```{r rice models}
+# family size and number of young children have most affect on rice expenditure
+rice_int = lm(Total.Rice.Expenditure ~ 
+               Total.Number.of.Family.members * Members.with.age.less.than.5.year.old,  
+              data=dat_merged)
+
+```
+```{r rice diagnostics}
+summary(rice_int)
+par(mfrow=c(2,2))
+termplot(rice_int, partial.resid = T, se=T)
+```
+Number of young children has less affect on rice expenditure than I thought. Interaction affect model seems to be better.
+
+
+```{r bread plots}
+
+png(filename='../figs/bread_income.png')
+plot(Bread.and.Cereals.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="bread/cereals expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Bread.and.Cereals.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+png(filename='../figs/bread_fsize.png')
+plot(Bread.and.Cereals.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="bread and cereal expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Bread.and.Cereals.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+
+```
+
+
+```{r bread models}
+# income, family size, and number of young children have most affect on bread/cereal expenditure
+bread_int = lm(Bread.and.Cereals.Expenditure ~ 
+               Total.Number.of.Family.members * log10(Total.Household.Income),  
+              data=dat_merged)
+
+```
+```{r bread diagnostics}
+summary(bread_int)
+
+par(mfrow=c(2,2))
+termplot(bread_int, partial.resid = T, se=T)
+```
+Similar to the examination of rice expenditures, number of young children doesn't seem to be a big factor in bread/cereal expenditure. Income has a significant affect on bread/cereal expenditure. Interaction affects model is slightly better. 
+
+
+```{r seafood plots}
+
+png(filename='../figs/seafood_income.png')
+plot(Total.Fish.and..marine.products.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="seafood expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income,
+             dat_merged$Total.Fish.and..marine.products.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+png(filename='../figs/seafood_fsize.png')
+plot(Total.Fish.and..marine.products.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="seafood expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Total.Fish.and..marine.products.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+png(filename='../figs/seafood_island.png')
+boxplot(Total.Fish.and..marine.products.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="island", ylab="seafood expenditure (pesos)", 
+        names=c("Luz", "Min", "Vis"), las=1)
+dev.off()
+
+
+
+```
+
+
+```{r seafood models}
+# income, family size, and island seem to have the most affect on seafood expenditures
+seafood_int = lm(Total.Fish.and..marine.products.Expenditure ~
+              log10(Total.Household.Income) * Island * Total.Number.of.Family.members,
+              data=dat_merged)
+
+
+```
+
+```{r seafood diagnostics}
+summary(seafood_int)
+
+par(mfrow=c(2,2))
+termplot(seafood_int, partial.resid = T, se=T)
+```
+Interaction affect is the best model. The termplot for number of family members in interaction affect model is interesting.
+
+```{r fruit plots}
+
+png(filename='../figs/fruit_island.png')
+boxplot(Fruit.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="island", ylab="fruit expenditure (pesos)",
+        names=c("Luz", "Min", "Vis"), las=1)
+dev.off()
+
+png(filename='../figs/fruit_income.png')
+plot(Fruit.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="fruit expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Fruit.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+
+```
+
+
+
+```{r fruit models}
+# island and income seems to have the most affect on fruit expenditure
+fruit_int = lm(Fruit.Expenditure ~ 
+               log10(Total.Household.Income) * Island,  
+              data=dat_merged)
+
+```
+```{r fruit diagnostics}
+summary(fruit_int)
+
+par(mfrow=c(2,2))
+termplot(fruit_int, partial.resid = T, se=T)
+```
+
+Interaction effect model is the best. Island doesn't seem to have much affect. Household income is a better indicator of fruit expenditures.
+
+
+```{r vegetable plots}
+
+png(filename='../figs/veg_income.png')
+plot(Vegetables.Expenditure ~ Total.Household.Income, data=dat_merged,
+     xlab="household income (pesos)", ylab="vegetables expenditure (pesos)", las=1)
+lines(lowess(dat_merged$Total.Household.Income, dat_merged$Vegetables.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+png(filename='../figs/veg_island.png')
+boxplot(Vegetables.Expenditure ~ Island, data=dat_merged,
+        outline=FALSE, xlab="island", ylab="vegetables expenditure (pesos)",
+        names=c("Luz", "Min", "Vis"), las=1)
+dev.off()
+
+png(filename='../figs/veg_fsize.png')
+plot(Vegetables.Expenditure ~ Total.Number.of.Family.members, data=dat_merged,
+        xlab="family size", ylab="vegetables expenditure", las=2)
+lines(lowess(dat_merged$Total.Number.of.Family.members, dat_merged$Vegetables.Expenditure),
+      col='red', lwd=2)
+dev.off()
+
+```
+
+
+```{r vegetable models}
+# island, family size and income seems to have the most affect on vegetable expenditure
+vegetable_int = lm(Vegetables.Expenditure ~ 
+               log10(Total.Household.Income) * Island * Total.Number.of.Family.members,  
+              data=dat_merged)
+
+```
+```{r vegetable diagnostics}
+summary(vegetable_int)
+
+par(mfrow=c(2,2))
+termplot(vegetable_int, partial.resid = T, se=T)
+```
+Interaction affect is the better model. Income has the biggest affect. Family size has a much smaller affect and island has a very small affect.
+
+
+
