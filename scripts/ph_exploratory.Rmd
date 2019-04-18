@@ -151,10 +151,6 @@ Seafood, fruit, and vegetable expenditure also seem to be affected by total hous
 Bread/cereal expenditure is not highly affected
 
 
-Investigating what factors affect rice expenditures.
-Examining other explanatory variables.
-
-
 Examining effect of number of family members on food expenditure.
 ```{r family}
 par(mfrow=c(2,4))
@@ -247,7 +243,7 @@ lines(lowess(dat_merged$Education.Expenditure, dat_merged$Vegetables.Expenditure
       col='red', lwd=2)
 
 ```
-Spending on education seems to have a substantial affect on household income and food expenditure. Household with higher incomes may be more willing to spend on education. Since households with higher incomes also spend more on food, this may explain why education is also positively correlated with education. A few of the food groups have slight increases as more is spent on education. Rice, bread/cereals, and fruit expenditures seem to be mostly unaffected by education expenditures.
+Spending on education appears to be correlated with household income and food expenditure. Household with higher incomes may be more willing to spend on education. Since households with higher incomes also spend more on food, this may explain why education is also positively correlated with certain food expenditures. A few of the food groups have slight increases as more is spent on education. Rice, bread/cereals, and fruit expenditures seem to be mostly unaffected by education expenditures.
 
 
 Examining if the number of young children affects food expenditures.
@@ -318,12 +314,18 @@ I was expecting the number of members under the age of 17 to have more affect on
 
 
 ```{r meat models}
+# income and island seem to have the most affect on meat expenditures
+
 #meat_null = lm(Meat.Expenditure ~ 1, data=dat_merged)
 meat_main = lm(Meat.Expenditure ~
               log10(Total.Household.Income) + Island, data=dat_merged)
 meat_int = lm(Meat.Expenditure ~
               log10(Total.Household.Income) * Island, data=dat_merged)
 
+
+```
+
+```{r meat diagnostics}
 #summary(meat_null)
 summary(meat_main)
 summary(meat_int)
@@ -331,23 +333,85 @@ summary(meat_int)
 #AIC(meat_null)
 AIC(meat_main)
 AIC(meat_int)
-```
 
-```{r meat diagnostics}
 par(mfrow=c(2,2))
+termplot(meat_main, partial.resid = T, se=T)
 termplot(meat_int, partial.resid = T, se=T)
 ```
-rice_mod = lm(Total.Rice.Expenditure ~ 
+The interaction affect model seems to be the best.
+
+
+```{r rice models}
+# family size and number of young children have most affect on rice expenditure
+rice_main = lm(Total.Rice.Expenditure ~ 
               Total.Number.of.Family.members + Members.with.age.less.than.5.year.old,
               data=dat_merged)
-summary(rice_mod)
+rice_int = lm(Total.Rice.Expenditure ~ 
+               Total.Number.of.Family.members * Members.with.age.less.than.5.year.old,  
+              data=dat_merged)
 
-bread_cereals_mod = lm(Bread.and.Cereals.Expenditure ~ 
-                       Total.Number.of.Family.members + Members.with.age.less.than.5.year.old,
-                       data=dat_merged)
-summary(bread_cereals_mod)
-
-```{r}
-#termplot(rice_mod, partial.resid = T, se=T)
-#termplot(bread_cereals_mod, partial.resid = T, se=T)
 ```
+```{r rice diagnostics}
+summary(rice_main)
+summary(rice_int)
+
+AIC(rice_main)
+AIC(rice_int)
+
+par(mfrow=c(2,2))
+termplot(rice_main, partial.resid = T, se=T)
+termplot(rice_int, partial.resid = T, se=T)
+```
+Number of young children has less affect on rice expenditure than I thought. Interaction affect model seems to be better.
+
+```{r bread models}
+# income, family size, and number of young children have most affect on bread/cereal expenditure
+bread_main = lm(Bread.and.Cereals.Expenditure ~ 
+              Total.Number.of.Family.members + Members.with.age.less.than.5.year.old +
+                log10(Total.Household.Income),
+              data=dat_merged)
+bread_int = lm(Bread.and.Cereals.Expenditure ~ 
+               Total.Number.of.Family.members * Members.with.age.less.than.5.year.old +
+                 log10(Total.Household.Income),  
+              data=dat_merged)
+
+```
+```{r bread diagnostics}
+summary(bread_main)
+summary(bread_int)
+
+AIC(bread_main)
+AIC(bread_int)
+
+par(mfrow=c(2,2))
+termplot(bread_main, partial.resid = T, se=T)
+termplot(bread_int, partial.resid = T, se=T)
+```
+Similar to the examination of rice expenditures, number of young children doesn't seem to be a big factor in bread/cereal expenditure. Interaction affects model is slightly better. 
+
+```{r seafood models}
+# income, family size, and island seem to have the most affect on seafood expenditures
+
+seafood_main = lm(Total.Fish.and..marine.products.Expenditure ~
+              log10(Total.Household.Income) + Island + Total.Number.of.Family.members,
+              data=dat_merged)
+seafood_int = lm(Total.Fish.and..marine.products.Expenditure ~
+              log10(Total.Household.Income) * Island * Total.Number.of.Family.members,
+              data=dat_merged)
+
+
+```
+
+```{r seafood diagnostics}
+summary(seafood_main)
+summary(seafood_int)
+
+AIC(seafood_main)
+AIC(seafood_int)
+
+par(mfrow=c(2,2))
+termplot(seafood_main, partial.resid = T, se=T)
+termplot(seafood_int, partial.resid = T, se=T)
+```
+Interaction affect is the best model. The termplot for number of family members in interaction affect model is interesting.
+
